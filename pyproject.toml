@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=45"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "metaflow-prebuilt"
+version = "0.1.0"
+description = "Metaflow extension: pre-bake conda environments into Docker images for fast cold starts"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.8"
+dependencies = [
+    "metaflow",
+]
+
+[project.optional-dependencies]
+ecr = ["boto3"]
+codebuild = ["boto3"]
+gcr = ["google-cloud-storage"]
+kaniko = ["google-cloud-storage", "kubernetes"]
+dev = [
+    "pytest>=7",
+    "pytest-mock",
+    "tox>=4",
+]
+
+[project.entry-points."metaflow_prebuilt.build_services"]
+docker    = "metaflow_extensions.prebuilt.plugins.conda.services.docker_service:LocalDockerBuildService"
+kaniko    = "metaflow_extensions.prebuilt.plugins.conda.services.kaniko_service:KanikoBuildService"
+buildx    = "metaflow_extensions.prebuilt.plugins.conda.services.buildx_service:BuildxBuildService"
+codebuild = "metaflow_extensions.prebuilt.plugins.conda.services.codebuild_service:CodeBuildService"
+
+[project.entry-points."metaflow_prebuilt.image_registries"]
+ecr       = "metaflow_extensions.prebuilt.plugins.conda.registries.ecr_registry:ECRRegistry"
+gcr       = "metaflow_extensions.prebuilt.plugins.conda.registries.gcr_registry:GCRRegistry"
+dockerhub = "metaflow_extensions.prebuilt.plugins.conda.registries.dockerhub_registry:DockerHubRegistry"
+local     = "metaflow_extensions.prebuilt.plugins.conda.registries.local_registry:LocalRegistry"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
