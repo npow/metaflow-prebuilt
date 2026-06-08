@@ -73,7 +73,7 @@ jobs:
           until docker info >/dev/null 2>&1; do sleep 1; done
       - name: Set up buildx builder
         run: |
-          docker buildx create --name local-builder --use
+          docker buildx create --name local-builder --use --driver-opt network=host
           docker buildx inspect --bootstrap
       - name: Run e2e test
         env:
