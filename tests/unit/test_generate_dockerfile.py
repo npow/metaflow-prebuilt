@@ -90,3 +90,20 @@ def test_generate_dockerfile_uses_prebuilt_module_path():
     )
     assert "metaflow_extensions.prebuilt" in dockerfile
     assert "metaflow_extensions.nflx" not in dockerfile
+
+
+def test_generate_dockerfile_custom_build_install_module():
+    """build_install_module is forwarded into the RUN step."""
+    env_id = _make_env_id()
+    resolved_env = _make_resolved_env()
+    custom_module = "metaflow_extensions.nflx.plugins.conda"
+    dockerfile, _ = _generate_dockerfile(
+        "ubuntu:22.04",
+        _env_path_for(env_id),
+        env_id,
+        "conda",
+        resolved_env,
+        build_install_module=custom_module,
+    )
+    assert custom_module + ".prebuilt_build_install" in dockerfile
+    assert "metaflow_extensions.prebuilt.plugins.conda.prebuilt_build_install" not in dockerfile

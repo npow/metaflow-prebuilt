@@ -85,6 +85,28 @@ class TestStateFilePersistLoad:
             PrebuiltCondaEnvironment._load_prebuilt_state()
 
 
+class TestBuildInstallModule:
+    def test_default_build_install_module(self):
+        assert (
+            PrebuiltCondaEnvironment._BUILD_INSTALL_MODULE
+            == "metaflow_extensions.prebuilt.plugins.conda"
+        )
+
+    def test_subclass_can_override_build_install_module(self):
+        class NflxPrebuiltEnvironment(PrebuiltCondaEnvironment):
+            _BUILD_INSTALL_MODULE = "metaflow_extensions.nflx.plugins.conda"
+
+        assert (
+            NflxPrebuiltEnvironment._BUILD_INSTALL_MODULE
+            == "metaflow_extensions.nflx.plugins.conda"
+        )
+        # Base class is unchanged
+        assert (
+            PrebuiltCondaEnvironment._BUILD_INSTALL_MODULE
+            == "metaflow_extensions.prebuilt.plugins.conda"
+        )
+
+
 class TestBootstrapCommands:
     def _make_env(self):
         flow = MagicMock()

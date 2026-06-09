@@ -115,6 +115,14 @@ class PrebuiltCondaEnvironment(CondaEnvironment):
 
     TYPE = "prebuilt"
 
+    # Subclasses must set this to the Python package that provides
+    # prebuilt_build_install — the RUN step in the generated Dockerfile
+    # calls `python -m <_BUILD_INSTALL_MODULE>.prebuilt_build_install`.
+    # The default points to the OSS module for documentation purposes;
+    # in practice you need a conda stack (nflx-metaflow or similar) to
+    # provide the real implementation.
+    _BUILD_INSTALL_MODULE: str = "metaflow_extensions.prebuilt.plugins.conda"
+
     _prebuilt_images: Dict[str, str] = {}
     _prebuilt_env_paths: Dict[str, str] = {}
     _STATE_FILE_ENV_VAR = "METAFLOW_PREBUILT_STATE_FILE"
@@ -358,6 +366,7 @@ class PrebuiltCondaEnvironment(CondaEnvironment):
             env_type,
             resolved_env,
             named_alias=named_alias,
+            build_install_module=type(self)._BUILD_INSTALL_MODULE,
         )
         context_files[_CODE_PACKAGE_TARBALL_NAME] = code_package_blob
 
@@ -447,6 +456,7 @@ def _generate_dockerfile(
     env_type: EnvType,
     resolved_env: Any,
     named_alias: Optional[str] = None,
+    build_install_module: str = "metaflow_extensions.prebuilt.plugins.conda",
 ) -> Tuple[str, Dict[str, Any]]:
     marker_json = json.dumps([env_id.req_id, env_id.full_id, env_id.arch])
     context_files: Dict[str, Any] = {}
@@ -473,8 +483,8 @@ def _generate_dockerfile(
         "WORKDIR %s" % PREBUILT_BUILD_LOCAL_ROOT,
         "",
         "RUN mkdir -p %s" % PREBUILT_ENVS_DIR,
-        "RUN python -m metaflow_extensions.prebuilt.plugins.conda.prebuilt_build_install "
-        "%s %s" % (env_id.req_id, env_id.full_id),
+        "RUN python -m %s.prebuilt_build_install %s %s"
+        % (build_install_module, env_id.req_id, env_id.full_id),
     ]
 
     if named_alias is not None:
