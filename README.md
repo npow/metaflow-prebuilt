@@ -1,3 +1,13 @@
+> [!WARNING]
+> **DEPRECATED — this repository has moved.**
+>
+> `metaflow-prebuilt` is now developed in **[Netflix/metaflow-nflx-extensions](https://github.com/Netflix/metaflow-nflx-extensions)**,
+> in the [`metaflow-prebuilt/`](https://github.com/Netflix/metaflow-nflx-extensions/tree/master/metaflow-prebuilt) subdirectory (alongside `metaflow-netflixext`).
+>
+> This repo is archived and read-only. Please file issues and pull requests in the new home.
+
+---
+
 # metaflow-prebuilt
 
 A [Metaflow](https://metaflow.org) extension that pre-bakes conda/PyPI
